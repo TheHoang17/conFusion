@@ -4,19 +4,20 @@ const passport = require('passport');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const dishRouter = require('./routes/dishRouter');
-const userRouter = require('./routes/usersRouter');
+const usersRouter = require('./routes/usersRouter');
+const uploadRouter = require('./routes/uploadRouter');
 const authenticate = require('./authenticate');
 const config = require('./config');
-const leaderRouter = require('./routes/leaderRouter');
-const promoRouter = require('./routes/promoRouter');
 
 const app = express();
 const port = 3000;
 
 // Connect to MongoDB
 const url = config.mongoUrl;
-const connect = mongoose.connect(url);
-
+const connect = mongoose.connect(url, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 connect.then(
   (db) => {
@@ -46,8 +47,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Mount routers
-app.use('/users', userRouter);
+app.use('/users', usersRouter);
 app.use(authenticate.verifyUser); // Using JWT for authentication
 app.use('/dishes', dishRouter);
-app.use('/leaders', leaderRouter);
-app.use('/promotions', promoRouter);
+	app.use('/imageUpload',uploadRouter);
