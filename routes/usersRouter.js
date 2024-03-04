@@ -6,7 +6,15 @@ const User = require('../models/user');
 const authenticate = require('../authenticate');
 
 usersRouter.use(bodyParser.json());
-
+usersRouter.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
+  	  if (req.user) {
+  	    var token = authenticate.getToken({_id: req.user._id});
+  	    res.statusCode = 200;
+  	    res.setHeader('Content-Type', 'application/json');
+  	    res.json({success: true, token: token, status: 'You are successfully logged in!'});
+  	  }
+  	});
+  
 usersRouter.post('/signup', (req, res, next) => {
   User.register(new User({username: req.body.username}), 
     req.body.password, (err, user) => {
@@ -20,6 +28,9 @@ usersRouter.post('/signup', (req, res, next) => {
         user.firstname = req.body.firstname;
       if (req.body.lastname)
         user.lastname = req.body.lastname;
+        if (req.body.admin === true) // Kiểm tra nếu admin được đặt thành true
+        user.admin = true; 
+      
       user.save()
         .then(() => {
             passport.authenticate('local')(req, res, () => {
