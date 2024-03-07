@@ -6,14 +6,7 @@ const User = require('../models/user');
 const authenticate = require('../authenticate');
 
 usersRouter.use(bodyParser.json());
-usersRouter.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
-  	  if (req.user) {
-  	    var token = authenticate.getToken({_id: req.user._id});
-  	    res.statusCode = 200;
-  	    res.setHeader('Content-Type', 'application/json');
-  	    res.json({success: true, token: token, status: 'You are successfully logged in!'});
-  	  }
-  	});
+
   
 usersRouter.post('/signup', (req, res, next) => {
   User.register(new User({username: req.body.username}), 
@@ -64,5 +57,12 @@ usersRouter.get('/logout', authenticate.verifyUser, (req, res) => {
   res.json({ success: true, status: 'Logout Successful!' });
 });
 
-
+usersRouter.get('/facebook/token', passport.authenticate('facebook-token'), (req, res) => {
+  if (req.user) {
+    var token = authenticate.getToken({_id: req.user._id});
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true, token: token, status: 'You are successfully logged in!'});
+  }
+});
 module.exports = usersRouter;
